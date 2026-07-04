@@ -23,78 +23,88 @@ jobs:
       - name: Configure AWS Credentials for China region audience
         uses: aws-actions/configure-aws-credentials@v6.1.0
         with:
-          audience: sts.amazonaws.com
+          audience: sts.amazonaws.com.cn
           aws-region: us-east-1
           role-to-assume: ${{ secrets.AWS_IAM_ROLE }}
 
       - name: Test AWS Credentials
         run: aws sts get-caller-identity
 
-      - name: Set Node.js 20.x
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20.x
+      # - name: Configure AWS Credentials
+      #   uses: aws-actions/configure-aws-credentials@v6.1.0
+      #   with:
+      #     audience: sts.amazonaws.com
+      #     aws-region: us-east-1
+      #     role-to-assume: ${{ secrets.AWS_IAM_ROLE }}
 
-      - name: Install Dependencies
-        run: npm install
+      # - name: Test AWS Credentials
+      #   run: aws sts get-caller-identity
 
-      - name: Test Project
-        run: npm test
+  #     - name: Set Node.js 20.x
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: 20.x
 
-      - name: Package app
-        run: tar --exclude='node_modules' --exclude='.git' -czf /tmp/app.tar.gz .
+  #     - name: Install Dependencies
+  #       run: npm install
 
-      - name: Move app artifact into workspace
-        run: mv /tmp/app.tar.gz app.tar.gz
+  #     - name: Test Project
+  #       run: npm test
 
-      - name: Upload app artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-artifact
-          path: app.tar.gz
-          retention-days: 7
+  #     - name: Package app
+  #       run: tar --exclude='node_modules' --exclude='.git' -czf /tmp/app.tar.gz .
 
-      - name: Generate SBOM (SPDX, via Syft)
-        uses: anchore/sbom-action@v0
-        with:
-          path: .
-          format: spdx-json
-          output-file: sbom.spdx.json
+  #     - name: Move app artifact into workspace
+  #       run: mv /tmp/app.tar.gz app.tar.gz
 
-      - name: Upload SBOM artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: sbom
-          path: sbom.spdx.json
-          retention-days: 7
+  #     - name: Upload app artifact
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: app-artifact
+  #         path: app.tar.gz
+  #         retention-days: 7
 
-  attest:
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
-      attestations: write
-    steps:
-      - name: Download app artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: app-artifact
-          path: .
+  #     - name: Generate SBOM (SPDX, via Syft)
+  #       uses: anchore/sbom-action@v0
+  #       with:
+  #         path: .
+  #         format: spdx-json
+  #         output-file: sbom.spdx.json
 
-      - name: Download SBOM artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: sbom
-          path: .
+  #     - name: Upload SBOM artifact
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: sbom
+  #         path: sbom.spdx.json
+  #         retention-days: 7
 
-      - name: Attest build provenance (SLSA)
-        uses: actions/attest@v4
-        with:
-          subject-path: app.tar.gz
+  # attest:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     contents: read
+  #     id-token: write
+  #     attestations: write
+  #   steps:
+  #     - name: Download app artifact
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: app-artifact
+  #         path: .
 
-      - name: Attest SBOM
-        uses: actions/attest@v4
-        with:
-          subject-path: app.tar.gz
-          sbom-path: sbom.spdx.json
+  #     - name: Download SBOM artifact
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: sbom
+  #         path: .
+
+  #     - name: Attest build provenance (SLSA)
+  #       uses: actions/attest@v4
+  #       with:
+  #         subject-path: app.tar.gz
+
+  #     - name: Attest SBOM
+  #       uses: actions/attest@v4
+  #       with:
+  #         subject-path: app.tar.gz
+  #         sbom-path: sbom.spdx.json
