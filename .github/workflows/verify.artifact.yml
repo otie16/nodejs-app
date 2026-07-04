@@ -1,7 +1,7 @@
 on:
   workflow_dispatch:
     inputs: { run_id: { required: true } }
-permissions: { contents: read, attestations: read, id-token: write }
+permissions: { contents: read, attestations: read }
 jobs:
   verify:
     runs-on: ubuntu-latest
@@ -10,4 +10,3 @@ jobs:
         with: { name: app-artifact, run-id: "${{ inputs.run_id }}", path: . }
       - run: gh attestation verify app.tar.gz --repo "${{ github.repository }}"
         env: { GH_TOKEN: "${{ github.token }}" }
- 
