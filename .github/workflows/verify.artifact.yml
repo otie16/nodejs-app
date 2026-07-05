@@ -10,3 +10,5 @@ jobs:
         with: { name: app-artifact, run-id: "${{ inputs.run_id }}", path: . }
       - run: gh attestation verify app.tar.gz --repo "${{ github.repository }}"
         env: { GH_TOKEN: "${{ github.token }}" }
+
+        # Intentional change
